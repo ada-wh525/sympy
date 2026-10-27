@@ -145,6 +145,27 @@ def test_KroneckerProduct_combine_mul():
         kronecker_product(A, X + Y) + kronecker_product(B, X)]
 
 
+def test_KroneckerProduct_combine_add_mixed():
+    A = MatrixSymbol('A', 2, 2)
+    B = MatrixSymbol('B', 2, 2)
+    C = MatrixSymbol('C', 4, 4)
+    D = MatrixSymbol('D', 4, 4)
+    for coeff in (1, 2, -1, x):
+        expr = coeff*KroneckerProduct(A, B) + C
+        assert combine_kronecker(expr) == expr
+        expr = coeff*KroneckerProduct(A, B) + C + 3*D
+        assert combine_kronecker(expr) == expr
+
+
+def test_KroneckerProduct_combine_add_mixed_merge():
+    A = MatrixSymbol('A', 2, 2)
+    B = MatrixSymbol('B', 2, 2)
+    C = MatrixSymbol('C', 2, 2)
+    D = MatrixSymbol('D', 4, 4)
+    expr = 2*KroneckerProduct(A, B) + 3*KroneckerProduct(C, B) + D
+    assert combine_kronecker(expr) == KroneckerProduct(2*A + 3*C, B) + D
+
+
 def test_KroneckerProduct_combine_add_numeric():
     # Numeric check that combine_kronecker preserves the value of sums:
     m1 = Matrix([[1, 2], [3, 4]])
